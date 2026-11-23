@@ -70,6 +70,23 @@
     }
     return {maps};
   }
-  const api={defaults,names,normalize,analyze,preview};
+  function normalizeInk(rgba,width,height){
+    if(!Number.isInteger(width)||!Number.isInteger(height)||width<1||height<1||rgba.length!==width*height*4)throw Error('图片数据尺寸不正确。');
+    const gray=new Float32Array(width*height);let border=0,borderCount=0,min=1,max=0;
+    for(let y=0;y<height;y++)for(let x=0;x<width;x++){const i=y*width+x,a=rgba[i*4+3]/255;const g=(rgba[i*4]*.299+rgba[i*4+1]*.587+rgba[i*4+2]*.114)/255*a+1-a;gray[i]=g;min=Math.min(min,g);max=Math.max(max,g);if(x===0||y===0||x===width-1||y===height-1){border+=g;borderCount++}}
+    if(max-min<.12)return null;
+    const invert=border/borderCount>.5;let left=width,right=-1,top=height,bottom=-1,count=0;
+    for(let y=0;y<height;y++)for(let x=0;x<width;x++){const i=y*width+x;gray[i]=Math.max(0,((invert?1-gray[i]:gray[i])-.12)/.88);if(gray[i]>.15){left=Math.min(left,x);right=Math.max(right,x);top=Math.min(top,y);bottom=Math.max(bottom,y);count++}}
+    if(right<left||count<8)return null;
+    const bw=right-left+1,bh=bottom-top+1,scale=Math.min(6/bw,8/bh),dw=bw*scale,dh=bh*scale,ox=(8-dw)/2,oy=(8-dh)/2,pixels=Array(64).fill(0);
+    for(let y=0;y<8;y++)for(let x=0;x<8;x++){
+      const x0=Math.max(left,left+(x-ox)/scale),x1=Math.min(right+1,left+(x+1-ox)/scale),y0=Math.max(top,top+(y-oy)/scale),y1=Math.min(bottom+1,top+(y+1-oy)/scale);
+      if(x1<=x0||y1<=y0)continue;let sum=0;
+      for(let sy=Math.floor(y0);sy<Math.ceil(y1);sy++)for(let sx=Math.floor(x0);sx<Math.ceil(x1);sx++){const area=(Math.min(sx+1,x1)-Math.max(sx,x0))*(Math.min(sy+1,y1)-Math.max(sy,y0));sum+=gray[sy*width+sx]*area}
+      pixels[y*8+x]=Math.min(1,Math.max(0,sum*scale*scale));
+    }
+    const peak=Math.max(...pixels);return peak>.05?pixels.map(x=>x/peak):null;
+  }
+  const api={defaults,names,normalize,analyze,preview,normalizeInk};
   if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.CNNCore=api;
 })(typeof globalThis!=='undefined'?globalThis:this);

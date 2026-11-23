@@ -270,7 +270,7 @@ def course_download(asset: str):
 
 @app.get('/{asset}')
 def static_asset(asset: str):
-    if asset not in ('cnn.html', 'cnn.css', 'cnn.js', 'cnn-core.js', 'style.css', 'app.js', 'index.html'):
+    if asset not in ('cnn.html', 'cnn.css', 'cnn.js', 'cnn-core.js', 'cnn-handwriting.js', 'style.css', 'app.js', 'index.html'):
         raise HTTPException(404, 'Not found')
     return FileResponse(ROOT / asset)
 
