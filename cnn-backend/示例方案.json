@@ -1,0 +1,11 @@
+{
+  "layers": [
+    {"kind":"conv", "channels":8, "kernel":3, "padding":"same"},
+    {"kind":"relu"},
+    {"kind":"pool"},
+    {"kind":"flatten"},
+    {"kind":"dense", "units":10}
+  ],
+  "epochs":5,
+  "seed":42
+}
