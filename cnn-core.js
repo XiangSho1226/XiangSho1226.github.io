@@ -3,7 +3,7 @@
   const defaults=()=>[{kind:'conv',channels:8,kernel:3,padding:'same'},{kind:'relu'},{kind:'pool'},{kind:'flatten'},{kind:'dense',units:10}];
   const names={conv:'卷积 · 找特征',relu:'激活 · 留下亮点',pool:'池化 · 缩小图',flatten:'展开 · 排成队',dense:'全连接 · 做判断'};
   function normalize(raw){
-    if(!Array.isArray(raw)||raw.length<1||raw.length>12)throw Error('方案需要 1–12 块积木。');
+    if(!Array.isArray(raw)||raw.length>12)throw Error('方案最多容纳 12 块积木。');
     return raw.map(l=>{
       if(!l||!Object.hasOwn(names,l.kind))throw Error('方案包含不认识的积木。');
       if(l.kind==='conv'){
@@ -19,6 +19,7 @@
   }
   function analyze(layers){
     let shape=[1,8,8],parameters=0;const trace=[];
+    if(!layers.length)return {valid:false,error:'还没有积木，拖一块进来试试吧。',trace,parameters};
     try{
       for(let i=0;i<layers.length;i++){
         const l=layers[i],input=shape.slice();let error='';
