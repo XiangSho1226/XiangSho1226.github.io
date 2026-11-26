@@ -36,6 +36,8 @@ def authorized(x_lab_token: str = Header(default='')):
 
 from picturebook import create_router
 app.include_router(create_router(authorized))
+from aicode import create_router as create_aicode_router
+app.include_router(create_aicode_router(authorized))
 
 
 class Layer(BaseModel):
@@ -274,7 +276,7 @@ def course_download(asset: str):
 
 @app.get('/{asset}')
 def static_asset(asset: str):
-    if asset not in ('picturebook.html', 'picturebook.css', 'picturebook.js', '画本接入说明.txt', 'cnn.html', 'cnn.css', 'cnn.js', 'cnn-core.js', 'cnn-handwriting.js', 'style.css', 'app.js', 'index.html'):
+    if asset not in ('aicode.html', 'aicode.css', 'aicode.js', 'aicode-core.js', 'AI编程说明.txt', 'picturebook.html', 'picturebook.css', 'picturebook.js', '画本接入说明.txt', 'cnn.html', 'cnn.css', 'cnn.js', 'cnn-core.js', 'cnn-handwriting.js', 'style.css', 'app.js', 'index.html'):
         raise HTTPException(404, 'Not found')
     return FileResponse(ROOT / asset)
 
