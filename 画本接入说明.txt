@@ -1,0 +1,38 @@
+我的 AI 创意画本（DeepSeek 版）
+
+在线入口：https://xiangsho1226.github.io/picturebook.html
+本机入口：http://127.0.0.1:8000/picturebook.html
+
+功能：角色、场景、动作、画风和要求卡片；语音转文字后确认；1/2/4幅故事；编辑故事文字；DeepSeek生成SVG矢量插画；浏览器作品收藏；家长展示；PNG与离线HTML下载；打印。
+DeepSeek的模型输出为文字。本功能通过JSON结构让模型编写故事和SVG矢量图，网页安全清洗后渲染，不调用OpenAI，不是扩散式照片生成服务。
+
+首次配置（老师操作）
+1. 在 https://platform.deepseek.com/api_keys 创建密钥，在服务商账户中检查可用余额和模型权限。密钥名称只是备注，不是模型名。
+2. 密钥只放在Python后端。不要填写到网页、GitHub、截图或作品文件。
+3. 在PowerShell中设置进程环境变量（请在本机输入实际值）：
+   $env:DEEPSEEK_API_KEY = '你的DeepSeek密钥'
+   $env:DEEPSEEK_MODEL = 'deepseek-flash'
+   如账户模型列表不同，按官方 /models 返回的可用模型名设置；兼容账户可使用deepseek-chat。
+4. 用既有Python环境运行 cnn-backend/main.py。首次安装参考原CNN体验课说明。
+5. 打开本机画本页，点“老师连接”，检查状态。GitHub页面也可连接已部署的HTTPS Python后端；部分浏览器限制HTTPS页面访问本机HTTP地址，优先从本机画本页使用。
+
+本次配置如采用Windows账户加密文件：用DEEPSEEK_KEY_FILE指定其绝对路径，且只能由同一Windows账户解密。加密文件不属于发布文件。更换密钥后需重启服务。
+默认API地址：https://api.deepseek.com；可用DEEPSEEK_BASE_URL指定兼容HTTPS服务。
+课堂共享时使用CNN_API_TOKEN连接口令和既有CNN_ORIGINS跨域配置。正式付费平台仍需独立的账号、购买权限和用量管理。
+
+使用方法
+选择卡片或自定义角色，输入要求。语音按钮仅在点击后请求麦克风权限；识别内容先显示在确认框，点击“加入我的要求”后才进入提示词。语音识别由浏览器服务处理，支持程度、网络和权限因设备而异，始终可手动输入。
+点“拼出故事草稿”，草稿文字是预设组合，可自由编辑；未生成插画时明确标注草稿。
+点“用DeepSeek创作插画”，每幅发起一次文字模型请求。生成会使用DeepSeek账户用量，1/2/4幅对应1/2/4次请求。停止会在当前请求结束后停止后续幅数，已发出的请求可能仍产生用量。
+可在完成或部分完成后保存作品；服务异常时保留已完成插画。角色一致性由共享描述提示约束，不能保证每幅完全相同。
+点“给爸爸妈妈看”进入作品展示，也可朗读、打印、下载PNG或离线HTML发给家人。下载HTML包含插画，无需接收者运行Python。
+作品收藏使用当前浏览器的IndexedDB，换设备或清除浏览器数据不会保留；请下载重要作品。
+
+接口
+GET /api/picturebook/status
+POST /api/picturebook/books（title、character、scene、action、style、wishes、captions）
+GET /api/picturebook/books/{id}
+POST /api/picturebook/books/{id}/stop
+图像以经过白名单清洗的SVG data URL返回；禁止脚本、外部链接与资源、foreignObject等内容。
+
+官方文档：https://api-docs.deepseek.com/guides/json_mode/

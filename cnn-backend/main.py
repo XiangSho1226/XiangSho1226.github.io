@@ -34,6 +34,10 @@ def authorized(x_lab_token: str = Header(default='')):
         raise HTTPException(401, '老师设置了连接口令，请在连接设置中填写。')
 
 
+from picturebook import create_router
+app.include_router(create_router(authorized))
+
+
 class Layer(BaseModel):
     model_config = ConfigDict(extra='forbid')
     kind: Literal['conv', 'relu', 'pool', 'flatten', 'dense']
@@ -270,7 +274,7 @@ def course_download(asset: str):
 
 @app.get('/{asset}')
 def static_asset(asset: str):
-    if asset not in ('cnn.html', 'cnn.css', 'cnn.js', 'cnn-core.js', 'cnn-handwriting.js', 'style.css', 'app.js', 'index.html'):
+    if asset not in ('picturebook.html', 'picturebook.css', 'picturebook.js', '画本接入说明.txt', 'cnn.html', 'cnn.css', 'cnn.js', 'cnn-core.js', 'cnn-handwriting.js', 'style.css', 'app.js', 'index.html'):
         raise HTTPException(404, 'Not found')
     return FileResponse(ROOT / asset)
 
